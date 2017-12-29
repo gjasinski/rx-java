@@ -1,43 +1,23 @@
 package rscraper;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-public class RadioactiveAtHomeUrlProvider implements Runnable, ObservableOnSubscribe {
+public class RadioactiveAtHomeUrlProvider implements UrlProvider {
     private final String urlBase;
-    private final int range;
+    private final int interval;
     private final int startAt;
-    private final Observable<URL> observable;
-    private volatile boolean continueWorking = true;
+    private int currentIndex;
 
 
-    public RadioactiveAtHomeUrlProvider(Observable<URL> observable, String urlBase, int range, int startAt) {
+    public RadioactiveAtHomeUrlProvider(String urlBase, int startAt, int interval) {
         this.urlBase = urlBase;
-        this.range = range;
-        this.startAt = startAt;
-        this.observable = observable;
+        this.interval = interval;
+        this.startAt = this.currentIndex = startAt;
     }
 
     @Override
-    public void run() {
-        try {
-            int currMeasuerementIf = startAt;
-            while (continueWorking) {
-                URL newUrl = new URL(urlBase + currMeasuerementIf);
-//                this.observable
-            }
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+    public synchronized String getNextUrl() {
+        String result = this.urlBase + this.currentIndex;
+        this.currentIndex += this.interval;
+        return result;
     }
 
-    @Override
-    public void subscribe(ObservableEmitter observableEmitter) throws Exception {
-
-    }
 }
